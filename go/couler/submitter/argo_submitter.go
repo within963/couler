@@ -21,7 +21,7 @@ func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow) (wfv1.Workflow,
 	// Use the current context in kubeconfig
 	config, err := clientcmd.BuildConfigFromFlags("", submitter.kubeConfigPath)
 	if err != nil {
-		return wf, fmt.Errorf("failed to get the current context in the kubeconfig file %s", submitter.kubeConfigPath)
+		return wf, fmt.Errorf("failed to get the current context in the kubeconfig file %s: %s", submitter.kubeConfigPath, err)
 	}
 
 	// Create the workflow client
@@ -30,9 +30,9 @@ func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow) (wfv1.Workflow,
 	// Submit the workflow
 	createdWf, err := wfClient.Create(&wf)
 	if err != nil {
-		return wf, fmt.Errorf("failed to created the workflow %s", wf.Name)
+		return wf, fmt.Errorf("failed to create the workflow %s: %s", wf.Name, err)
 	}
-	fmt.Printf("Workflow %s submitted\n", createdWf.Name)
+	fmt.Printf("Workflow %s successfully submitted\n", createdWf.Name)
 
 	// Wait for the workflow to complete
 	fieldSelector := fields.ParseSelectorOrDie(fmt.Sprintf("metadata.name=%s", createdWf.Name))
@@ -47,7 +47,7 @@ func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow) (wfv1.Workflow,
 			continue
 		}
 		if wf.Status.Phase == wfv1.NodeFailed || wf.Status.Phase == wfv1.NodeError {
-			return *wf, fmt.Errorf("workflow %s failed", wf.Name)
+			return *wf, fmt.Errorf("workflow %s failed: %s", wf.Name, wf.Status.Message)
 		}
 		if !wf.Status.FinishedAt.IsZero() {
 			fmt.Printf("Workflow %s %s at %v\n", wf.Name, wf.Status.Phase, wf.Status.FinishedAt)
