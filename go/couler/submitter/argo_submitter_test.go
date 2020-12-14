@@ -4,12 +4,17 @@ import (
 	"github.com/alecthomas/assert"
 	"github.com/couler-proj/couler/go/couler/conversion"
 	pb "github.com/couler-proj/couler/go/couler/proto/couler/v1"
+	"os"
 	"os/user"
 	"path/filepath"
 	"testing"
 )
 
 func TestArgoWorkflowSubmitter(t *testing.T) {
+	toTest := os.Getenv("E2E_TEST")
+	if toTest == "" || toTest == "false" {
+		t.Skip("Skipping end-to-end tests")
+	}
 	pbWf := &pb.Workflow{}
 	containerStep := &pb.Step{
 		TmplName: "container-test", ContainerSpec: &pb.ContainerSpec{
