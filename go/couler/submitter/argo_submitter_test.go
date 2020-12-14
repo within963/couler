@@ -59,7 +59,7 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 	assert.NoError(t, err)
 
 	submitter := ArgoWorkflowSubmitter{
-		namespace:      "default",
+		namespace:      "argo",
 		kubeConfigPath: filepath.Join(usr.HomeDir, ".kube", "config"),
 	}
 	_, err = submitter.Submit(argoWf)
