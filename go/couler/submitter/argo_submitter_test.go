@@ -49,7 +49,11 @@ func TestArgoWorkflowSubmitter(t *testing.T) {
 			FailureCondition: "status.failed > 3",
 		},
 	}
-	pbWf.Steps = []*pb.Step{containerStep, scriptStep, resourceStep}
+	pbWf.Steps = []*pb.ConcurrentSteps{
+		{Steps: []*pb.Step{containerStep}},
+		{Steps: []*pb.Step{scriptStep}},
+		{Steps: []*pb.Step{resourceStep}},
+	}
 
 	argoWf, err := conversion.ConvertToArgoWorkflow(pbWf, "hello-world-")
 	assert.NoError(t, err)

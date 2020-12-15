@@ -46,9 +46,6 @@ func (submitter *ArgoWorkflowSubmitter) Submit(wf wfv1.Workflow) (wfv1.Workflow,
 		if !ok {
 			continue
 		}
-		if wf.Status.Phase == wfv1.NodeFailed || wf.Status.Phase == wfv1.NodeError {
-			return *wf, fmt.Errorf("workflow %s failed: %s", wf.Name, wf.Status.Message)
-		}
 		if !wf.Status.FinishedAt.IsZero() {
 			fmt.Printf("Workflow %s %s at %v\n", wf.Name, wf.Status.Phase, wf.Status.FinishedAt)
 			break
